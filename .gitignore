@@ -10,5 +10,9 @@ wheels/
 .venv
 
 # Stuff
-test/*
+*.png
+*.jpg
+*.mp4
 *.log
+mydata/*
+test.py
