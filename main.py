@@ -1,6 +1,5 @@
 import json
 import os
-import PIL
 from src.Image import Image
 from src.Video import Video
 from tqdm import tqdm
@@ -8,28 +7,31 @@ from tqdm import tqdm
 
 def combine_overlays():
     target_dir = "mydata/memories"
+    output_dir = "temp_output"
     targets = sorted(os.listdir(target_dir))[:-1]
-    for i in range(len(targets)):
-        target_path = f"{target_dir}/{targets[i]}"
-        if "overlay" in target_path:
-            base_path = f"{target_dir}/{targets[i-1]}"
-            base = PIL.Image.open(base_path).convert("RGBA")
-            overlay = PIL.Image.open(target_path).convert("RGBA")
-
-            combined = PIL.Image.alpha_composite(base, overlay)
-            combined.save(f"temp_output/{targets[i-1]}")
+    for target in tqdm(targets, desc="Combining overlays"):
+        if "overlay" in target:
+            continue
+        target_path = f"{target_dir}/{target}"
+        if ".jpg" in target or ".png" in target:
+            file = Image(target_path)
+            output = f"{target.replace("main", '')[:-4].join('')}.png"
+        else:
+            file = Video(target_path)
+            output = target.replace("main", '')
+        output_path = f"{output_dir}/{output}"
+        overlay = f"{output[:-4]}overlay.png"
+        if overlay in targets:
+            file.combine(f"{target_dir}/{overlay}", output_path)
+        else:
+            file.copy_file(output_path)
 
 
 def main():
     target_dir = "mydata/memories"
     with open("mydata/json/memories_history.json") as f:
         data = reversed(json.load(f)["Saved Media"])
-    targets = sorted(os.listdir(target_dir))[:-1]
-    print(len(data))
-    print(len(targets))
-    for i in len(targets):
-        dir = f"{target_dir}/{targets[i]}"
-        target_data = data[i]
+    combine_overlays()
 
 
 if __name__ == "__main__":

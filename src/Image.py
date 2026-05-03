@@ -24,7 +24,7 @@ class Image:
                 raise KeyError("No DateTime metadata found") from e
             return dto
 
-    def copy_image(self, path):
+    def copy_file(self, path):
         shutil.copy(self._path, path)
         return Image(path)
 

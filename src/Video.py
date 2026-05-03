@@ -7,7 +7,7 @@ class Video:
     def __init__(self, path):
         self._path = path
 
-    def copy_video(self, path):
+    def copy_file(self, path):
         (
             ffmpeg
             .input(self._path)
@@ -49,35 +49,36 @@ class Video:
             self._path
         ], check=True)
 
-    # def combine(self, input, output):
-    #     probe = ffmpeg.probe(self._path)
-    #     duration = float(probe["format"]["duration"])
-    #     video = ffmpeg.input(self._path)
-    #     overlay = ffmpeg.input(input, loop=1)
-    #     try:
-    #         (
-    #             ffmpeg
-    #             .overlay(video, overlay)
-    #             .output(
-    #                 output,
-    #                 shortest=None,
-    #                 vcodec="libx264",
-    #                 acodec="copy",
-    #                 t=duration)
-    #             .run()
-    #         )
-    #     except ffmpeg.Error as e:
-    #         print(e.stderr)
-
     def combine(self, input, output):
+        probe = ffmpeg.probe(self._path)
+        duration = float(probe["format"]["duration"])
+        video_stream = next(s for s in probe["streams"] if s["codec_type"] == "video")
+
+        base_h = int(video_stream["width"])
+        base_w = int(video_stream["height"])
+        print(base_w, base_h)
+
         base = ffmpeg.input(self._path)
-        overlay = ffmpeg.input(input, loop=1)
-        (
+        base_video = base.video
+        base_audio = base.audio
+        overlay = (
             ffmpeg
-            .overlay(base, overlay)
-            .output(output, shortest=None, vcodec="libx264")
-            .run()
+            .input(input, loop=1, t=duration)
+            .filter('scale', base_w, base_h, force_original_aspect_ratio="increase")
+            .filter('crop', base_w, base_h)
         )
+        
+        try:
+            (
+                ffmpeg
+                .filter([base_video, overlay], 'overlay', x=0, y=0)
+                .output(base_audio, output, vcodec="libx264", acodec="aac", shortest=None)
+                .run()
+            )
+        except ffmpeg.Error as e:
+            print(e.stderr)
+
+        return Video(output)
 
     @property
     def path(self):
