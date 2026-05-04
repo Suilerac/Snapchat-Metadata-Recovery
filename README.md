@@ -44,7 +44,7 @@ Results are written to the `output/` directory.
 
 **Functions you may call directly**
 - `combine_overlays()` — merges overlays and copies files without overlays.
-- `restore_dates()` — reapplies capture datetimes from exported metadata.
+- `restore_metadata()` — reapplies capture datetimes and location coordinates from exported metadata.
 
 **Notes & troubleshooting**
 - This was made in a way that kept previewability with my cloud storage provider. I cannot guarantee it's kept with every provider, as I can't test it.
