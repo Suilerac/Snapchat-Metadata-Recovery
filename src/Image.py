@@ -15,16 +15,35 @@ class Image(Mediafile):
         """
         super().__init__(path)
 
-    def change_date(self, new_date):
+    def update_metadata(self, date, lat, lon):
         """
         Changes exif metadata of creation date to target date
 
         :param new_date: target date, string, format YYYY:MM:DD HH:MM:SS
         """
         DTO_KEY = "Exif.Photo.DateTimeOriginal"
+        GPS = "Exif.GPSInfo.GPS"
+
+        latdms = self._to_dms(lat)
+        londms = self._to_dms(lon)
+        latref = "N" if lat >= 0 else "S"
+        lonref = "E" if lon >= 0 else "W"
+
+        if lat == 0 and lon == 0:  # No location metadata
+            with pe2.Image(self._path) as img:
+                img.modify_exif({
+                    DTO_KEY: date
+                })
+            return
 
         with pe2.Image(self._path) as img:
-            img.modify_exif({DTO_KEY: new_date})
+            img.modify_exif({
+                DTO_KEY: date,
+                f"{GPS}Latitude": latdms,
+                f"{GPS}LatitudeRef": latref,
+                f"{GPS}Longitude": londms,
+                f"{GPS}LongitudeRef": lonref
+                })
 
     def get_date(self):
         """
@@ -39,24 +58,6 @@ class Image(Mediafile):
             except KeyError as e:
                 raise KeyError("No DateTime metadata found") from e
             return dto
-
-    def change_location(self, lat, lon):
-        if lat == 0 and lon == 0:  # No location metadata
-            return
-        GPS = "Exif.GPSInfo.GPS"
-
-        latdms = self._to_dms(lat)
-        londms = self._to_dms(lon)
-        latref = "N" if lat >= 0 else "S"
-        lonref = "E" if lon >= 0 else "W"
-
-        with pe2.Image(self._path) as img:
-            img.modify_exif({
-                f"{GPS}Latitude": latdms,
-                f"{GPS}LatitudeRef": latref,
-                f"{GPS}Longitude": londms,
-                f"{GPS}LongitudeRef": lonref
-                            })
 
     def get_location(self):
         """

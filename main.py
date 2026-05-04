@@ -36,36 +36,21 @@ def combine_overlays():
             file.copy_file(output_path)
 
 
-def restore_dates():
+def restore_metadata():
     target_dir = "output"
     targets = sorted(os.listdir(target_dir))
     with open("mydata/json/memories_history.json") as f:
         data = json.load(f)["Saved Media"]
     file_data_pairs = zip(targets, reversed(data))
-    pbar = tqdm(total=len(targets), desc="Restoring dates")
+    pbar = tqdm(total=len(targets), desc="Restoring metadata")
     for filename, info in file_data_pairs:
+        # Date
         datetime = info["Date"].split(" ")[:-1]  # Separate date and time, exclude UTC
         date = datetime[0].replace("-", ":")  # Adapt to fit form
         time = datetime[1]  # Already fits form
         datetime = f"{date} {time}"
-        _, ext = os.path.splitext(filename)
-        if ext == ".mp4":
-            file = Video(f"{target_dir}/{filename}")
-        else:
-            file = Image(f"{target_dir}/{filename}")
-        file.change_date(datetime)
-        pbar.update(1)
-    pbar.close()
 
-
-def restore_locations():
-    target_dir = "output"
-    targets = sorted(os.listdir(target_dir))
-    with open("mydata/json/memories_history.json") as f:
-        data = json.load(f)["Saved Media"]
-    file_data_pairs = zip(targets, reversed(data))
-    pbar = tqdm(total=len(targets), desc="Restoring locations")
-    for filename, info in file_data_pairs:
+        # Location
         coords = info["Location"].split(":")[-1]
         lat = float(coords.split(",")[0].strip(" "))
         lon = float(coords.split(",")[1].strip(" "))
@@ -74,7 +59,7 @@ def restore_locations():
             file = Video(f"{target_dir}/{filename}")
         else:
             file = Image(f"{target_dir}/{filename}")
-        file.change_location(lat, lon)
+        file.update_metadata(datetime, lat, lon)
         pbar.update(1)
     pbar.close()
 
@@ -82,8 +67,7 @@ def restore_locations():
 def main():
     Path("output").mkdir(exist_ok=True)
     combine_overlays()
-    restore_dates()
-    restore_locations()
+    restore_metadata()
 
 
 if __name__ == "__main__":

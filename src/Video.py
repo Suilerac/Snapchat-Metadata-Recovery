@@ -27,12 +27,15 @@ class Video(Mediafile):
         )
         return Video(path)
 
-    def change_date(self, date):
+
+    def update_metadata(self, date, lat, lon):
         """
         Changes the exif metadata of the video
-        to chosen date.
+        to chosen date and location.
          
         :param date: Date-string of format YYYY:MM:DD HH:MM:SS
+        :param lat: Latitude
+        :param lon: Longitude
         """
         temp_path = f"{self._path[:-4].join("")}_temp.mp4"
         (
@@ -46,35 +49,49 @@ class Video(Mediafile):
             .run(overwrite_output=True)
         )
         os.replace(temp_path, self._path)
-        subprocess.run([
-            "exiftool",
-            "-overwrite_original",
 
-            # QuickTime container dates
-            f"-QuickTime:CreateDate={date}",
-            f"-QuickTime:ModifyDate={date}",
-            f"-QuickTime:TrackCreateDate={date}",
-            f"-QuickTime:MediaCreateDate={date}",
-
-            # Apple / iOS ecosystem
-            f"-Keys:CreationDate={date}",
-
-            # File system timestamps
-            f"-FileCreateDate={date}",
-            f"-FileModifyDate={date}",
-
-            self._path
-        ], check=True)
-
-    def change_location(self, lat, lon):
         if lat == 0 and lon == 0:  # No location metadata
-            return
-        subprocess.run([
-            "exiftool",
-            "-overwrite_original",
-            f"-Keys:GPSCoordinates={lat},{lon}",
-            self._path
-        ])
+            subprocess.run([
+                "exiftool",
+                "-overwrite_original",
+
+                # QuickTime container dates
+                f"-QuickTime:CreateDate={date}",
+                f"-QuickTime:ModifyDate={date}",
+                f"-QuickTime:TrackCreateDate={date}",
+                f"-QuickTime:MediaCreateDate={date}",
+
+                # Apple / iOS ecosystem
+                f"-Keys:CreationDate={date}",
+
+                # File system timestamps
+                f"-FileCreateDate={date}",
+                f"-FileModifyDate={date}",
+
+                self._path
+            ], check=True)
+        else:
+            subprocess.run([
+                "exiftool",
+                "-overwrite_original",
+
+                # QuickTime container dates
+                f"-QuickTime:CreateDate={date}",
+                f"-QuickTime:ModifyDate={date}",
+                f"-QuickTime:TrackCreateDate={date}",
+                f"-QuickTime:MediaCreateDate={date}",
+
+                # Apple / iOS ecosystem
+                f"-Keys:CreationDate={date}",
+
+                # File system timestamps
+                f"-FileCreateDate={date}",
+                f"-FileModifyDate={date}",
+
+                f"-QuickTime:GPSCoordinates={lat},{lon}",
+                f"-Keys:GPSCoordinates={lat},{lon}",
+
+                self._path], check=True)
 
     def combine(self, input, output):
         probe = ffmpeg.probe(self._path)

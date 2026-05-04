@@ -6,11 +6,7 @@ class Mediafile(ABC):
         self._path = path
 
     @abstractmethod
-    def change_date(self, new_date):
-        pass
-
-    @abstractmethod
-    def change_location(self, lat, lon):
+    def update_metadata(self, date, lat, lon):
         pass
 
     @abstractmethod
