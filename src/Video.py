@@ -36,7 +36,7 @@ class Video:
         temp_path = f"{self._path[:-4].join("")}_temp.mp4"
         (
             ffmpeg
-            .input(self._path)
+            .input(self._path, loglevel="quiet")
             .output(
                 temp_path,
                 vcodec="libx264",
@@ -64,44 +64,6 @@ class Video:
 
             self._path
         ], check=True)
-
-    # def combine(self, input, output):
-    #     """
-    #     Overlays input video on top of self, outputting to
-    #     output path.
-
-    #     :param input: Path-string to target overlay
-    #     :param output: Path-string to output file
-    #     """
-    #     probe = ffmpeg.probe(self._path)
-    #     duration = float(probe["format"]["duration"])
-    #     video_stream = next(s for s in probe["streams"] if s["codec_type"] == "video")
-
-    #     base_h = int(video_stream["width"])
-    #     base_w = int(video_stream["height"])
-
-    #     base = ffmpeg.input(self._path)
-    #     base_video = base.video
-    #     base_audio = base.audio
-    #     overlay = (
-    #         ffmpeg
-    #         .input(input, loop=1, t=duration)
-    #         .filter('scale', base_w, base_h)
-    #         .filter('crop', base_w, base_h)
-    #     )
-        
-    #     try:
-    #         (
-    #             ffmpeg
-    #             .filter([base_video, overlay], 'overlay', x=0, y=0)
-    #             .output(base_audio, output, vcodec="libx264", acodec="aac", shortest=None)
-    #             .global_args("-loglevel", "quiet")
-    #             .run()
-    #         )
-    #     except ffmpeg.Error as e:
-    #         print(e.stderr)
-
-    #     return Video(output)
 
     def combine(self, input, output):
         probe = ffmpeg.probe(self._path)
