@@ -1,6 +1,6 @@
 import pyexiv2 as pe2
 import shutil
-from Mediafile import Mediafile
+from .Mediafile import Mediafile
 from PIL import Image as PILImage
 
 
@@ -11,7 +11,7 @@ class Image(Mediafile):
 
         :param path: Path-string to image file
         """
-        super.__init__(self, path)
+        super().__init__(path)
 
     def change_date(self, new_date):
         """

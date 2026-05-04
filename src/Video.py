@@ -1,7 +1,7 @@
 import ffmpeg
 import subprocess
 import os
-from Mediafile import Mediafile
+from .Mediafile import Mediafile
 
 
 class Video(Mediafile):
@@ -11,7 +11,7 @@ class Video(Mediafile):
 
         :param path: Path-string to video file
         """
-        super.__init__(self, path)
+        super().__init__(path)
 
     def copy_file(self, path):
         """
@@ -67,9 +67,12 @@ class Video(Mediafile):
         ], check=True)
 
     def change_location(self, lat, lon):
-        latref = "N" if lat >= 0 else "S"
-        lonref = "E" if lon >= 0 else "W"
-        return
+        subprocess.run([
+            "exiftool",
+            "-overwrite_original",
+            f"-Keys:GPSCoordinates={lat},{lon}",
+            self._path
+        ])
 
     def combine(self, input, output):
         probe = ffmpeg.probe(self._path)
