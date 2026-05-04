@@ -49,11 +49,14 @@ class Image(Mediafile):
         londms = self._to_dms(lon)
         latref = "N" if lat >= 0 else "S"
         lonref = "E" if lon >= 0 else "W"
+
         with pe2.Image(self._path) as img:
-            img.modify_exif({f"{GPS}Latitude": latdms})
-            img.modify_exif({f"{GPS}LatitudeRef": latref})
-            img.modify_exif({f"{GPS}Longitude": londms})
-            img.modify_exif({f"{GPS}LongitudeRef": lonref})
+            img.modify_exif({
+                f"{GPS}Latitude": latdms,
+                f"{GPS}LatitudeRef": latref,
+                f"{GPS}Longitude": londms,
+                f"{GPS}LongitudeRef": lonref
+                            })
 
     def get_location(self):
         """
