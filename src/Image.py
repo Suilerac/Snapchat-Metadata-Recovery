@@ -1,16 +1,17 @@
 import pyexiv2 as pe2
 import shutil
+from Mediafile import Mediafile
 from PIL import Image as PILImage
 
 
-class Image:
+class Image(Mediafile):
     def __init__(self, path):
         """
         Class for handling images
 
         :param path: Path-string to image file
         """
-        self._path = path
+        super.__init__(self, path)
 
     def change_date(self, new_date):
         """
@@ -92,14 +93,3 @@ class Image:
         combined = PILImage.alpha_composite(base, overlay)
         combined.save(output)
         return Image(output)
-
-    @property
-    def path(self):
-        return self._path
-
-    def _to_dms(self, value):
-        deg = int(value)
-        min_float = (value - deg) * 60
-        min = int(min_float)
-        sec = ((min_float - min) * 60)
-        return f"{deg}/1 {min}/1 {int(sec * 100)}/100"

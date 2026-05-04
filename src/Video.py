@@ -1,16 +1,17 @@
 import ffmpeg
 import subprocess
 import os
+from Mediafile import Mediafile
 
 
-class Video:
+class Video(Mediafile):
     def __init__(self, path):
         """
         Class for handling a video file
 
         :param path: Path-string to video file
         """
-        self._path = path
+        super.__init__(self, path)
 
     def copy_file(self, path):
         """
@@ -65,6 +66,11 @@ class Video:
             self._path
         ], check=True)
 
+    def change_location(self, lat, lon):
+        latref = "N" if lat >= 0 else "S"
+        lonref = "E" if lon >= 0 else "W"
+        return
+
     def combine(self, input, output):
         probe = ffmpeg.probe(self._path)
         duration = float(probe["format"]["duration"])
@@ -107,7 +113,3 @@ class Video:
         )
 
         return Video(output)
-
-    @property
-    def path(self):
-        return self._path
