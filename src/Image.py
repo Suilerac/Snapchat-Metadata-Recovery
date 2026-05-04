@@ -37,6 +37,36 @@ class Image:
                 raise KeyError("No DateTime metadata found") from e
             return dto
 
+    def change_location(self, lat, lon):
+        GPS = "Exif.GPSInfo.GPS"
+
+        latdms = self._to_dms(lat)
+        londms = self._to_dms(lon)
+        latref = "N" if lat >= 0 else "S"
+        lonref = "E" if lon >= 0 else "W"
+
+        with pe2.Image(self._path) as img:
+            img.modify_exif({f"{GPS}Latitude": latdms})
+            img.modify_exif({f"{GPS}LatitudeRef": latref})
+            img.modify_exif({f"{GPS}Longitude": londms})
+            img.modify_exif({f"{GPS}LongitudeRef": lonref})
+
+    def get_location(self):
+        """
+        Gets the current location given by exif metadata
+        """
+        LAT_KEY = "Exif.GPSInfo.GPSLatitude"
+        LON_KEY = "Exif.GPSInfo.GPSLongitude"
+
+        with pe2.Image(self._path) as img:
+            exif = img.read_exif()
+            try:
+                lat = exif[LAT_KEY]
+                lon = exif[LON_KEY]
+            except KeyError as e:
+                raise KeyError("No DateTime metadata found") from e
+            return (lat, lon)
+
     def copy_file(self, path):
         """
         Copies image file to target path
@@ -66,3 +96,10 @@ class Image:
     @property
     def path(self):
         return self._path
+
+    def _to_dms(self, value):
+        deg = int(value)
+        min_float = (value - deg) * 60
+        min = int(min_float)
+        sec = ((min_float - min) * 60)
+        return f"{deg}/1 {min}/1 {int(sec * 100)}/100"
