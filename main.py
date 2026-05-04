@@ -43,7 +43,7 @@ def restore_dates():
         data = json.load(f)["Saved Media"]
     file_data_pairs = zip(targets, reversed(data))
     pbar = tqdm(total=len(targets), desc="Restoring dates")
-    for filename, info in tqdm(file_data_pairs, desc="Restoring dates"):
+    for filename, info in file_data_pairs:
         datetime = info["Date"].split(" ")[:-1]  # Separate date and time, exclude UTC
         date = datetime[0].replace("-", ":")  # Adapt to fit form
         time = datetime[1]  # Already fits form
