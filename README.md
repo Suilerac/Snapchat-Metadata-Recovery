@@ -21,6 +21,7 @@ uv venv --python 3.14
 source .venv/bin/activate
 uv sync
 # ensure ffmpeg is installed (e.g. `brew install ffmpeg` on macOS)
+# ensure exiftool is installed (e.g. 'brew install exiftool' on macOS)
 ```
 
 **Quick usage**
@@ -43,8 +44,6 @@ Results are written to the `output/` directory.
 **Functions you may call directly**
 - `combine_overlays()` — merges overlays and copies files without overlays.
 - `restore_dates()` — reapplies capture datetimes from exported metadata.
-- `combine_overlays_videos()` — debug helper to combine overlays only for videos.
-- `get_overlay_list()` — writes `Overlays.txt` listing video files that have overlays.
 
 **Notes & troubleshooting**
 - Currently this does not restore location data, only timestamps
