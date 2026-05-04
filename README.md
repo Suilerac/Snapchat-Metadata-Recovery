@@ -1,9 +1,9 @@
 
 # Snapchat Metadata Recovery
 
-Tools to reconstruct Snapchat Memories exports: combine overlays, restore original capture dates, and produce shareable media files.
+Tools to reconstruct Snapchat Memories exports: combine overlays, restore original capture dates and locations, and produce shareable media files. If you know me personally and don't want to go through the hassle of setting the project up yourself, just reach out to me with the memories zip file and I'll run it for you when I have time yes.
 
-**Why this exists:** Snapchat exports separate "main" media files and overlay files, and they also don't include original timestamp and location metadata. This project recombines them and reapplies original timestamps from the exported metadata so recovered media keep their original dates. At the moment it does not recover location data.
+**Why this exists:** Snapchat exports separate "main" media files and overlay files, and they also don't include original timestamp and location metadata. This project recombines them and reapplies original timestamps from the exported metadata so recovered media keep their original dates and location data.
 
 **Features**
 - **Combine overlays:** merges overlay images onto video/image main files and saves results to `output/`.
@@ -38,6 +38,7 @@ Results are written to the `output/` directory.
 
 **Main scripts**
 - **Main runner:** [main.py](main.py)
+- **Parent class** [src/Mediafile.py](src/Mediafile.py)
 - **Image processing:** [src/Image.py](src/Image.py)
 - **Video processing:** [src/Video.py](src/Video.py)
 
@@ -46,10 +47,10 @@ Results are written to the `output/` directory.
 - `restore_dates()` — reapplies capture datetimes from exported metadata.
 
 **Notes & troubleshooting**
-- Currently this does not restore location data, only timestamps
 - This was made in a way that kept previewability with my cloud storage provider. I cannot guarantee it's kept with every provider, as I can't test it.
 - If videos fail to combine, confirm `ffmpeg` is available on your PATH.
-- This has not been extensively tested as the sample size is purely my own exported snapchat memories. Things can and probably will break.
+- This has not been extensively tested as the sample size is purely my own exported snapchat memories, with the script running on my macbook. Things can and probably will break.
+- The progress bar gets broken up by outputs of "1 image files updated". This is an output from pyexiv2 which I can't supress. I chose to keep the progress bar so you can actually see how much you have left, even if it isn't pretty.
 
 **Further development**
-This is really just a little pet project written in two days for my own personal needs. I might add location data restoration as well, but I won't do much work on this beyond that.
+This is really just a little pet project written in two days for my own personal needs. I probably won't do much more work on it.
