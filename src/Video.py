@@ -67,6 +67,8 @@ class Video(Mediafile):
         ], check=True)
 
     def change_location(self, lat, lon):
+        if lat == 0 and lon == 0:  # No location metadata
+            return
         subprocess.run([
             "exiftool",
             "-overwrite_original",

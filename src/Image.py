@@ -1,7 +1,9 @@
 import pyexiv2 as pe2
 import shutil
+import os
 from .Mediafile import Mediafile
 from PIL import Image as PILImage
+from contextlib import redirect_stdout, redirect_stderr
 
 
 class Image(Mediafile):
@@ -39,13 +41,14 @@ class Image(Mediafile):
             return dto
 
     def change_location(self, lat, lon):
+        if lat == 0 and lon == 0:  # No location metadata
+            return
         GPS = "Exif.GPSInfo.GPS"
 
         latdms = self._to_dms(lat)
         londms = self._to_dms(lon)
         latref = "N" if lat >= 0 else "S"
         lonref = "E" if lon >= 0 else "W"
-
         with pe2.Image(self._path) as img:
             img.modify_exif({f"{GPS}Latitude": latdms})
             img.modify_exif({f"{GPS}LatitudeRef": latref})
