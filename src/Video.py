@@ -10,7 +10,7 @@ class Video:
     def copy_file(self, path):
         (
             ffmpeg
-            .input(self._path)
+            .input(self._path, loglevel='quiet')
             .output(path, c="copy")
             .run()
         )
@@ -54,9 +54,9 @@ class Video:
         duration = float(probe["format"]["duration"])
         video_stream = next(s for s in probe["streams"] if s["codec_type"] == "video")
 
-        base_h = int(video_stream["width"])
-        base_w = int(video_stream["height"])
-        print(base_w, base_h)
+        resolution = [int(video_stream["width"]), int(video_stream["height"])]
+        base_h = min(resolution)
+        base_w = max(resolution)
 
         base = ffmpeg.input(self._path)
         base_video = base.video
@@ -73,6 +73,7 @@ class Video:
                 ffmpeg
                 .filter([base_video, overlay], 'overlay', x=0, y=0)
                 .output(base_audio, output, vcodec="libx264", acodec="aac", shortest=None)
+                .global_args("-loglevel", "quiet")
                 .run()
             )
         except ffmpeg.Error as e:

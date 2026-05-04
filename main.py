@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 from src.Image import Image
 from src.Video import Video
 from tqdm import tqdm
@@ -13,14 +14,16 @@ def combine_overlays():
         if "overlay" in target:
             continue
         target_path = f"{target_dir}/{target}"
-        if ".jpg" in target or ".png" in target:
+        name, ext = os.path.splitext(target)
+        if ext == "jpg" or ext == "png":
             file = Image(target_path)
-            output = f"{target.replace("main", '')[:-4].join('')}.png"
+            name, _ = os.path.splitext(target)
+            output = f"{name.replace("main", '')}.png"
         else:
             file = Video(target_path)
             output = target.replace("main", '')
         output_path = f"{output_dir}/{output}"
-        overlay = f"{output[:-4]}overlay.png"
+        overlay = f"{name.replace("main", '')}overlay.png"
         if overlay in targets:
             file.combine(f"{target_dir}/{overlay}", output_path)
         else:
@@ -31,6 +34,7 @@ def main():
     target_dir = "mydata/memories"
     with open("mydata/json/memories_history.json") as f:
         data = reversed(json.load(f)["Saved Media"])
+    Path("temp_output").mkdir(exist_ok=True)
     combine_overlays()
 
 
