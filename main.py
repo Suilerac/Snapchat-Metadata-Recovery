@@ -32,6 +32,23 @@ def combine_overlays():
             file.copy_file(output_path)
 
 
+def combine_overlays_videos():
+    target_dir = "mydata/memories"
+    output_dir = "temp_output"
+    targets = sorted(os.listdir(target_dir))[:-1]
+    for target in tqdm(targets, desc="Combining overlays"):
+        name, ext = os.path.splitext(target)
+        if ext != ".mp4":
+            continue
+        target_path = f"{target_dir}/{target}"
+        vid = Video(target_path)
+        overlay = name.replace("main", "overlay.png")
+        overlay_path = f"{target_dir}/{overlay}"
+        output_path = f"{output_dir}/{target}"
+        if overlay in targets:
+            vid.combine(overlay_path, output_path)
+
+
 def get_overlay_list():
     target_dir = "mydata/memories"
     targets = sorted(os.listdir(target_dir))[:-1]
@@ -49,7 +66,7 @@ def main():
     with open("mydata/json/memories_history.json") as f:
         data = reversed(json.load(f)["Saved Media"])
     Path("temp_output").mkdir(exist_ok=True)
-    get_overlay_list()
+    combine_overlays_videos()
 
 
 if __name__ == "__main__":

@@ -65,41 +65,84 @@ class Video:
             self._path
         ], check=True)
 
-    def combine(self, input, output):
-        """
-        Overlays input video on top of self, outputting to
-        output path.
+    # def combine(self, input, output):
+    #     """
+    #     Overlays input video on top of self, outputting to
+    #     output path.
 
-        :param input: Path-string to target overlay
-        :param output: Path-string to output file
-        """
+    #     :param input: Path-string to target overlay
+    #     :param output: Path-string to output file
+    #     """
+    #     probe = ffmpeg.probe(self._path)
+    #     duration = float(probe["format"]["duration"])
+    #     video_stream = next(s for s in probe["streams"] if s["codec_type"] == "video")
+
+    #     base_h = int(video_stream["width"])
+    #     base_w = int(video_stream["height"])
+
+    #     base = ffmpeg.input(self._path)
+    #     base_video = base.video
+    #     base_audio = base.audio
+    #     overlay = (
+    #         ffmpeg
+    #         .input(input, loop=1, t=duration)
+    #         .filter('scale', base_w, base_h)
+    #         .filter('crop', base_w, base_h)
+    #     )
+        
+    #     try:
+    #         (
+    #             ffmpeg
+    #             .filter([base_video, overlay], 'overlay', x=0, y=0)
+    #             .output(base_audio, output, vcodec="libx264", acodec="aac", shortest=None)
+    #             .global_args("-loglevel", "quiet")
+    #             .run()
+    #         )
+    #     except ffmpeg.Error as e:
+    #         print(e.stderr)
+
+    #     return Video(output)
+
+    def combine(self, input, output):
         probe = ffmpeg.probe(self._path)
         duration = float(probe["format"]["duration"])
         video_stream = next(s for s in probe["streams"] if s["codec_type"] == "video")
 
-        base_h = int(video_stream["width"])
-        base_w = int(video_stream["height"])
+        # base_w = int(video_stream["width"])
+        # base_h = int(video_stream["height"])
+        resolution = (int(video_stream["width"]), int(video_stream["height"]))
+        base_w = min(resolution)
+        base_h = max(resolution)
 
         base = ffmpeg.input(self._path)
         base_video = base.video
         base_audio = base.audio
+
         overlay = (
             ffmpeg
             .input(input, loop=1, t=duration)
-            .filter('scale', base_w, base_h)
-            .filter('crop', base_w, base_h)
-        )
-        
-        try:
-            (
-                ffmpeg
-                .filter([base_video, overlay], 'overlay', x=0, y=0)
-                .output(base_audio, output, vcodec="libx264", acodec="aac", shortest=None)
-                .global_args("-loglevel", "quiet")
-                .run()
+            .filter(
+                'scale',
+                f'if(gt(iw/ih,{base_w}/{base_h}),-1,{base_w})',
+                f'if(gt(iw/ih,{base_w}/{base_h}),{base_h},-1)'
             )
-        except ffmpeg.Error as e:
-            print(e.stderr)
+            .filter(
+                'crop',
+                base_w,
+                base_h,
+                f'(iw-{base_w})/2',
+                f'(ih-{base_h})/2'
+            )
+        )
+
+        video = ffmpeg.filter([base_video, overlay], 'overlay', x=0, y=0)
+
+        (
+            ffmpeg
+            .output(video, base_audio, output, vcodec="libx264", acodec="aac", shortest=None)
+            .global_args("-loglevel", "quiet")
+            .run(overwrite_output=True)
+        )
 
         return Video(output)
 
