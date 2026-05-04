@@ -38,8 +38,10 @@ def get_overlay_list():
     with open("Overlays.txt", 'w') as f:
         for target in targets:
             if "overlay" in target:
-                f.write(target)
-                f.write('\n')
+                vid = target.replace("overlay.png", "main.mp4")
+                if vid in targets:
+                    f.write(vid)
+                    f.write('\n')
 
 
 def main():

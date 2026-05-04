@@ -16,3 +16,5 @@ wheels/
 *.log
 mydata/*
 test.py
+Overlays.txt
+.DS_Store
