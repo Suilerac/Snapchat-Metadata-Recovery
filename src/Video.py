@@ -5,9 +5,19 @@ import os
 
 class Video:
     def __init__(self, path):
+        """
+        Class for handling a video file
+
+        :param path: Path-string to video file
+        """
         self._path = path
 
     def copy_file(self, path):
+        """
+        Copies file to target path
+
+        :param path: Path-string to target destination
+        """
         (
             ffmpeg
             .input(self._path, loglevel='quiet')
@@ -17,6 +27,12 @@ class Video:
         return Video(path)
 
     def change_date(self, date):
+        """
+        Changes the exif metadata of the video
+        to chosen date.
+         
+        :param date: Date-string of format YYYY:MM:DD HH:MM:SS
+        """
         temp_path = f"{self._path[:-4].join("")}_temp.mp4"
         (
             ffmpeg
@@ -50,13 +66,19 @@ class Video:
         ], check=True)
 
     def combine(self, input, output):
+        """
+        Overlays input video on top of self, outputting to
+        output path.
+
+        :param input: Path-string to target overlay
+        :param output: Path-string to output file
+        """
         probe = ffmpeg.probe(self._path)
         duration = float(probe["format"]["duration"])
         video_stream = next(s for s in probe["streams"] if s["codec_type"] == "video")
 
-        resolution = [int(video_stream["width"]), int(video_stream["height"])]
-        base_h = min(resolution)
-        base_w = max(resolution)
+        base_h = int(video_stream["width"])
+        base_w = int(video_stream["height"])
 
         base = ffmpeg.input(self._path)
         base_video = base.video
@@ -64,7 +86,7 @@ class Video:
         overlay = (
             ffmpeg
             .input(input, loop=1, t=duration)
-            .filter('scale', base_w, base_h, force_original_aspect_ratio="increase")
+            .filter('scale', base_w, base_h)
             .filter('crop', base_w, base_h)
         )
         
