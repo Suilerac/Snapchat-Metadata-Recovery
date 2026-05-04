@@ -1,9 +1,7 @@
 import pyexiv2 as pe2
 import shutil
-import os
 from .Mediafile import Mediafile
 from PIL import Image as PILImage
-from contextlib import redirect_stdout, redirect_stderr
 
 
 class Image(Mediafile):
