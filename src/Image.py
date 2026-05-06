@@ -17,7 +17,9 @@ class Image(Mediafile):
         """
         Changes exif metadata of creation date to target date
 
-        :param new_date: target date, string, format YYYY:MM:DD HH:MM:SS
+        :param date: target date, string, format YYYY:MM:DD HH:MM:SS
+        :param lat: Latitude
+        :param lon: Longitude
         """
         DTO_KEY = "Exif.Photo.DateTimeOriginal"
         GPS = "Exif.GPSInfo.GPS"

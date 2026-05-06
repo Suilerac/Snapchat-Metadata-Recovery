@@ -50,7 +50,6 @@ Results are written to the `output/` directory.
 - This was made in a way that kept previewability with my cloud storage provider. I cannot guarantee it's kept with every provider, as I can't test it.
 - If videos fail to combine, confirm `ffmpeg` is available on your PATH.
 - This has not been extensively tested as the sample size is purely my own exported snapchat memories, with the script running on my macbook. Things can and probably will break.
-- The progress bar gets broken up by outputs of "1 image files updated". This is an output from pyexiv2 which I can't supress. I chose to keep the progress bar so you can actually see how much you have left, even if it isn't pretty.
 
 **Further development**
 This is really just a little pet project written in two days for my own personal needs. I probably won't do much more work on it.

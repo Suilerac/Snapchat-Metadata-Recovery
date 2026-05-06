@@ -54,6 +54,7 @@ class Video(Mediafile):
             subprocess.run([
                 "exiftool",
                 "-overwrite_original",
+                "-quiet",
 
                 # QuickTime container dates
                 f"-QuickTime:CreateDate={date}",
@@ -74,6 +75,7 @@ class Video(Mediafile):
             subprocess.run([
                 "exiftool",
                 "-overwrite_original",
+                "-quiet",
 
                 # QuickTime container dates
                 f"-QuickTime:CreateDate={date}",
@@ -94,6 +96,12 @@ class Video(Mediafile):
                 self._path], check=True)
 
     def combine(self, input, output):
+        """
+        Combines overlay on top of video
+
+        :param input: Overlay file path
+        :param output: Final combination path
+        """
         probe = ffmpeg.probe(self._path)
         duration = float(probe["format"]["duration"])
         video_stream = next(s for s in probe["streams"] if s["codec_type"] == "video")
